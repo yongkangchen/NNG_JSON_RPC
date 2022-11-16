@@ -1,2 +1,2 @@
-# NNG_JSON_RPC
-RPC implemention base on NNG and JSON-RPC
+# nng-json-rpc
+RPC implemention base on [pynng](https://github.com/codypiersall/pynng) and [json-rpc](https://github.com/pavlov99/json-rpc)
