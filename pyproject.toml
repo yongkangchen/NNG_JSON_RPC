@@ -1,0 +1,2 @@
+[build-system]
+requires = ["json-rpc ~= 1.13.0", "pynng ~= 0.7.1"]
