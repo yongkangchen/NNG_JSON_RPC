@@ -7,26 +7,42 @@ class RPCServer:
 	def __init__(self, address):
 		self.address = address
 		self.dispatcher = Dispatcher()
+		
+		self.ssock = pynng.Rep0()
+		lis = self.ssock.listen(self.address)
+		
+		self.local_address = lis.local_address
 
 	def register_function(self, function = None, name = None):
 		return self.dispatcher.add_method(function, name)
 
+	def build_method_map(self, prototype, prefix=''):
+		return self.dispatcher.build_method_map(prototype, prefix)
+
 	async def response(self, sock, msg):
 		content = msg.bytes.decode()
+
+		# print("request content: ", content)
 		
 		response = JSONRPCResponseManager.handle(
 			content, self.dispatcher)
 
-		if response is None: return
+		if response is None: 
+			# print("response content => ", None)
+			return
 
+		if asyncio.iscoroutine(response.result):
+			response.result = await response.result
+		
+		# print("response content => ", response.json)
 		await sock.asend(response.json.encode())
 
 	async def start(self):
-		ssock = pynng.Rep0()
-		ssock.listen(self.address)
 		while True:
-			sock = ssock.new_context()
+			sock = self.ssock.new_context()
+			
 			msg = await sock.arecv_msg()
+
 			asyncio.create_task(self.response(sock, msg))
 
 	def serve_forever(self):
