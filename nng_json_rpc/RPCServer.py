@@ -31,7 +31,7 @@ class RPCServer:
 			# print("response content => ", None)
 			return
 
-		if asyncio.iscoroutine(response.result):
+		if asyncio.iscoroutine(response.result) or asyncio.isfuture(response.result):
 			response.result = await response.result
 		
 		# print("response content => ", response.json)
